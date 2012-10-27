@@ -10,6 +10,7 @@ end
 desc "Runs the console"
 task :console => :environment do
   require "irb"
+  require "awesome_print"
   include CinesApi
   ARGV.clear
   IRB.start
