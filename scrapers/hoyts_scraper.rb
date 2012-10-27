@@ -3,7 +3,7 @@ require "open-uri"
 
 module CinesApi
   class HoytsScraper
-    def movies
+    def run
       theaters = {
         "La Reina"         => "reina",
         "Parque Arauco"    => "par",
@@ -21,15 +21,14 @@ module CinesApi
         url = "http://www.cinehoyts.cl/?mod=#{identifier}"
         doc = Nokogiri::HTML(open(url))
 
-        # Construct the output hash for this theater
-        theater = {
-          :name => name,
-          :url => url,
-          :location => [0,0], # Should be [lat, lng]
-          :movies => []
-        }
+        unless theater = Theater.where(:name => name).first
+          # Create it then.
+          theater = Theater.create :name => name, :url => url, :lat => 0, :lng => 0
+        else
+          # Clear all the movies
+          theater.movies.destroy_all
+        end
 
-        # Holds a movie's name temporarily
         movie = {}
 
         doc.css('td div div td td td:nth-child(3) td:nth-child(1)').each do |movie_row|
@@ -39,17 +38,14 @@ module CinesApi
           else
             # puts "Horario: #{movie_row.text.strip}"
             movie[:showtimes] = movie_row.text.strip.split(/,?\s+/)
-            theater[:movies] << movie
+
+            Movie.create :name => movie[:name], :showtimes => movie[:showtimes], :theater => theater
 
             # Reset this hash
             movie = {}
           end
         end
-
-        out_theaters << theater
       end
-
-      out_theaters
     end
   end
 end

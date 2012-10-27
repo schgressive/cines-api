@@ -16,5 +16,16 @@ task :console => :environment do
   IRB.start
 end
 
+desc "Runs all scrapers and updates the database"
+task :update => :environment do
+  print "Updating Cinemark..."
+  CinesApi::CinemarkScraper.new.run
+  puts "done"
+
+  print "Updating Hoyts..."
+  CinesApi::HoytsScraper.new.run
+  puts "done"
+end
+
 task :s => :server
 task :c => :console

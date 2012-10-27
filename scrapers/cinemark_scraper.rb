@@ -3,7 +3,7 @@ require "open-uri"
 
 module CinesApi
   class CinemarkScraper
-    def movies
+    def run
       theaters = {
         "Alto las Condes" => "DetalleCine.aspx?cinema=512",
         "Plaza Oeste" => "DetalleCine.aspx?cinema=513",
@@ -26,32 +26,28 @@ module CinesApi
         url = "http://www.cinemark.cl/#{identifier}"
         doc = Nokogiri::HTML(open(url))
 
-        # Construct the output hash for this theater
-        theater = {
-          :name => name,
-          :url => url,
-          :location => [0,0], # Should be [lat, lng]
-          :movies => []
-        }
+        unless theater = Theater.where(:name => name).first
+          # Create it then.
+          theater = Theater.create :name => name, :url => url, :lat => 0, :lng => 0
+        else
+          # Clear all the movies
+          theater.movies.destroy_all
+        end
 
         # Holds a movie's name temporarily
         movie = {}
 
         doc.css('#box_left .box_middle').each do |row|
-          movie[:name] = row.at_css('.h18').text.strip
-          movie[:showtimes] = row.at_css('table tr:first-child td:last-child').text.strip.split(/[\s\t\n\r]+/).keep_if do |showtime|
+          movie = Movie.new :theater => theater
+
+          movie.name = row.at_css('.h18').text.strip
+          movie.showtimes = row.at_css('table tr:first-child td:last-child').text.strip.split(/[\s\t\n\r]+/).keep_if do |showtime|
             showtime =~ /\d+:\d/
-          end
+          end.join(' ')
 
-          theater[:movies] << movie
-
-          movie = {}
+          movie.save
         end
-
-        out_theaters << theater
       end
-
-      out_theaters
     end
   end
 end
