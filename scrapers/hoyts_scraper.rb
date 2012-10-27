@@ -11,11 +11,10 @@ module CinesApi
         "Estación Central" => "ecentral",
         "Arauco Maipú"     => "maipu",
         "Puente Alto"      => "palto",
+        # This one is different for some retarded reason.
         # "Melipilla"        => "melipilla",
         "Valparaíso"       => "valpo"
       }
-
-      out_theaters = []
 
       theaters.each_pair do |name, identifier|
         url = "http://www.cinehoyts.cl/?mod=#{identifier}"

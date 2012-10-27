@@ -20,8 +20,6 @@ module CinesApi
         "Portal Ñuñoa" => "DetalleCine.aspx?cinema=2300"
       }
 
-      out_theaters = []
-
       theaters.each_pair do |name, identifier|
         url = "http://www.cinemark.cl/#{identifier}"
         doc = Nokogiri::HTML(open(url))
@@ -33,9 +31,6 @@ module CinesApi
           # Clear all the movies
           theater.movies.destroy_all
         end
-
-        # Holds a movie's name temporarily
-        movie = {}
 
         doc.css('#box_left .box_middle').each do |row|
           movie = Movie.new :theater => theater
