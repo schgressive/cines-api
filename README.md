@@ -1,6 +1,6 @@
 # Cines API
 
-An attempt at an open JSON API with movie showtimes for chilean Movie Theaters. Since none of the websites provide an API for this I though I'd make my own.
+An attempt at an open JSON API with movie showtimes for chilean movie theaters. Since none of the websites provide an API for this I thought I'd make my own.
 
 # Requirements
 
