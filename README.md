@@ -4,7 +4,7 @@ An attempt at an open JSON API with movie showtimes for chilean movie theaters. 
 
 # Requirements
 
-  * Ruby 1.9.3 (though it might work on other versions)
+  * Ruby 2.3.1 (though it might work on other versions)
   * MongoDB
 
 # How to run it

@@ -29,14 +29,10 @@ module CinesApi
     end
 
     post '/webhook' do
-      #action = request.body.read.to_h
-      puts params["result"]["action"]
       if params["result"]["action"] == "show_theaters"
         show_theaters
       elsif params["result"]["action"] == "see_movies"
-        theater_name = params["result"]["parameters"]["theater_name"]
-        puts theater_name.inspect
-        show_movies theater_name
+        show_movies params["result"]["parameters"]["theater_name"]
       else
         halt 404
       end
@@ -51,7 +47,6 @@ module CinesApi
           elements << {
               "title": theater.name,
               "image_url": "http://www.logotypes101.com/logos/278/2BD38DC98A9956FB2D0BB0595FC5CE81/cinehoyts.png",
-              #"subtitle": "Smurfette attempts to find her purpose in the village. When she encounters a creature in the Forbidden Forest who drops a mysterious map, she sets off with her friends Brainy, Clumsy, and Hefty on an adventure to find the Lost Village before the evil wizard Gargamel does.",
               "default_action": {
                   "type": "web_url",
                   "url": theater.url,
@@ -92,12 +87,10 @@ module CinesApi
     end
 
     def show_movies theater_name
-      #theater = Theater.where(:name => theater_name).first
       theater = Theater.where(name: /^#{theater_name}/i).first
       return halt 404 if theater.nil?
       elements = []
       theater.movies.limit(10).each do |movie|
-        puts movie.name
         elements << {
             "title": movie.name,
             "image_url": movie.image_url,
