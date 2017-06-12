@@ -22,9 +22,9 @@ task :update => :environment do
   CinesApi::CinemarkScraper.new.run
   puts "done"
 
-  print "Updating Hoyts..."
-  CinesApi::HoytsScraper.new.run
-  puts "done"
+  # print "Updating Hoyts..."
+  # CinesApi::HoytsScraper.new.run
+  # puts "done"
 end
 
 task :s => :server

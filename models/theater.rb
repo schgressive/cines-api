@@ -4,6 +4,7 @@ module CinesApi
 
     field :name, :type => String
     field :url, :type => String
+    field :theater_identifier, :type => String
     field :lat, :type => Integer
     field :lng, :type => Integer
 

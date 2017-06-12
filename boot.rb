@@ -5,6 +5,10 @@ require "bundler"
 
 Bundler.require
 
+require 'rack'
+
+require 'rack/contrib'
+
 require "sinatra/base"
 
 require "models/movie"

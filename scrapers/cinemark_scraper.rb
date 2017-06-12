@@ -5,41 +5,46 @@ module CinesApi
   class CinemarkScraper
     def run
       theaters = {
-        "Alto las Condes" => "DetalleCine.aspx?cinema=512",
-        "Plaza Oeste" => "DetalleCine.aspx?cinema=513",
-        "Plaza Norte" => "DetalleCine.aspx?cinema=572",
-        "Espacio Urbano" => "DetalleCine.aspx?cinema=514",
-        "Iquique" => "DetalleCine.aspx?cinema=520",
-        "Rancagua" => "DetalleCine.aspx?cinema=517",
-        "Plaza Mirador Bio-Bio" => "PlazaMiradorBioBio.html",
-        "Plaza Vespucio" => "DetalleCine.aspx?cinema=511",
-        "Plaza Tobalaba" => "DetalleCine.aspx?cinema=519",
-        "Plaza del Trébol" => "DetalleCine.aspx?cinema=548",
-        "Marina Arauco" => "DetalleCine.aspx?cinema=570",
-        "Plaza La Serena" => "DetalleCine.aspx?cinema=521",
-        "Portal Ñuñoa" => "DetalleCine.aspx?cinema=2300"
+        # SANTIAGO
+        "Alto las Condes" => "alto-las-condes",
+        "Plaza Vespucio" => "vespucio",
+        "Plaza Tobalaba" => "plaza-tobala",
+        "Plaza Norte" => "plaza-norte",
+        "Plaza Oeste" => "plaza-oeste",
+        "Portal Ñuñoa" => "portal-nunoa",
+        "Mid Mall Maipú" => "midmall"
+        # REGIONES
+        # "Espacio Urbano - Viña del Mar" => "vina-shopping",
+        # "Iquique" => "DetalleCine.aspx?cinema=520",
+        # "Rancagua" => "DetalleCine.aspx?cinema=517",
+        # "Plaza Mirador Bio-Bio" => "PlazaMiradorBioBio.html",
+        # "Plaza del Trébol" => "DetalleCine.aspx?cinema=548",
+        # "Marina Arauco" => "DetalleCine.aspx?cinema=570",
+        # "Plaza La Serena" => "DetalleCine.aspx?cinema=521",
       }
 
       theaters.each_pair do |name, identifier|
-        url = "http://www.cinemark.cl/#{identifier}"
+        url = "http://www.cinemark.cl/theatres/#{identifier}"
         doc = Nokogiri::HTML(open(url))
 
         unless theater = Theater.where(:name => name).first
           # Create it then.
-          theater = Theater.create :name => name, :url => url, :lat => 0, :lng => 0
+          theater = Theater.create :name => name, :url => url#, :lat => 0, :lng => 0
         else
           # Clear all the movies
           theater.movies.destroy_all
         end
 
-        doc.css('#box_left .box_middle').each do |row|
+        doc.css('#theater-show-list .movie-list-li').each do |row|
           movie = Movie.new :theater => theater
-
-          movie.name = row.at_css('.h18').text.strip
-          movie.showtimes = row.at_css('table tr:first-child td:last-child').text.strip.split(/[\s\t\n\r]+/).keep_if do |showtime|
-            showtime =~ /\d+:\d/
-          end.join(' ')
-
+          movie.name = row.at_css('.movie-list-detail h3 span').text.strip
+          movie.image_url = row.at_css('img')["src"]
+          movie.url = row.at_css('a')["href"]
+          showtimes = []
+          row.css('.showtime-items li').each do |showtime|
+            showtimes << "#{showtime.css('.showtime-day').text} #{showtime.css('.showtime-hour').map { |e| e.text }.join(', ')}"
+          end
+          movie.showtimes = showtimes.join("_")
           movie.save
         end
       end
