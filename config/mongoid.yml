@@ -1,13 +1,17 @@
+defaults: &defaults  
+    host: <%= ENV['MONGOID_HOST'] %>
+    port: <%= ENV['MONGOID_PORT'] %>
+    username: <%= ENV['MONGOID_USER'] %>
+    password: <%= ENV['MONGOID_PASS'] %>
+    database: <%= ENV['MONGOID_DATABASE'] %>
+
 development:
-  clients:
-    default:
-      database: cines-api
-      hosts:
-        - localhost:27017
+   <<: *defaults
         
 production:
-  clients:
-    default:
-      database: cines-api
-      hosts:
-        - localhost:27017
+   <<: *defaults
+  # clients:
+  #   default:
+  #     database: cines-api
+  #     hosts:
+  #       - localhost:27017
